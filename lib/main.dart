@@ -145,6 +145,19 @@ added to the text”
               //     ],
               //   );
               // },
+               layoutBuilder: (currentChild, previousChildren) {
+                return Stack(
+                  children: [
+                    ...previousChildren,
+                    if (currentChild != null)
+                      AnimatedOpacity(
+                        opacity: 1.0,
+                        duration: const Duration(milliseconds: 800),
+                        child: currentChild,
+                      ),
+                  ],
+                );
+              },
 
               /// By default there but you can modify it
               // transitionBuilder: (Widget child, Animation<double> animation) {
