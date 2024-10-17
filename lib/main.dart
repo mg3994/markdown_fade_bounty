@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_selectionarea/flutter_markdown_selectionarea.dart';
 
@@ -29,87 +28,36 @@ class AnimatedTextScreen extends StatefulWidget {
 }
 
 class _AnimatedTextScreenState extends State<AnimatedTextScreen> {
-  final List<String> _textList = [
-    '''
-### Problem
-
-We’re building an LLM based tool for one of our FilledStacks clients. 
-  ''',
-    '''
-As with ChatGPT, the response from the LLM is streamed back to us.
-  ''',
-    '''
-The text comes back as it 
-  ''',
-    '''
-is being completed. 
-  ''',
-    '''
-Here’s an example of how
-  ''',
-    '''
-paragraph would be returned:
-  ''',
-    '''
-**The full paragraph**
-
-“I need every new
-  ''',
-    '''
-word being added to the text to animate i
-  ''',
-    '''
-n using a fade functionality. This an
-  ''',
-    '''
-example of this can be seen when using Gemini chat.”
-  ''',
-    '''
-**How it’s returned**
-
-“I need”
-  ''',
-    '''
-“I need every new word”
-  ''',
-    '''
-“I need every new word
-  ''',
-    '''
-being added to”
-  ''',
-    '''
-“I need every new word being
-  ''',
-    '''
-added to the text”
-  ''',
-    '''
-“I need every new word being added to the text to animate in”
-  ''',
+  String _currentText = "## Problem\nThis is"; // Initial text
+  final ScrollController _scrollController = ScrollController();
+  final List<String> _incomingTexts = [
+    "## Problem\nThis is the main issue with what",
+    "## Problem\nThis is the main issue with what we're trying to solve.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required. The development cycle has slowed down due to these issues.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required. The development cycle has slowed down due to these issues, resulting in missed deadlines.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required. The development cycle has slowed down due to these issues, resulting in missed deadlines and higher costs."
   ];
 
-  String _currentText = "";
-  int _index = 0;
-  final ScrollController _scrollController = ScrollController();
+  int _textIndex = 0;
 
-  // Function to append new text from the list
+  // Function to append new text
   void _addText() {
-    if (_index < _textList.length) {
+    if (_textIndex < _incomingTexts.length) {
       setState(() {
-        _currentText += _textList[_index];
-        _index++;
+        _currentText = _incomingTexts[_textIndex]; // Simulate backend response
+        _textIndex++;
       });
-
-      // After the text has been added, scroll to the bottom  (only if content is larger)
       _scrollToBottom();
     }
   }
 
-  final _defaultMessage = 'Tap FAB to add markdown';
-  // Function to scroll the content to the bottom
+  // Function to scroll to the bottom
   void _scrollToBottom() {
-    // just an improvement to scroll to bottom
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -123,58 +71,33 @@ added to the text”
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Animated Text Display'),
+        title: const Text('Animated Markdown  Display'),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 700),
-          child: SingleChildScrollView(
-            controller: _scrollController, // Attach scroll controller
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 1000),
-              // TODO:
-              // try modifying this by using layoutBuilder parm (not to by default) to something else where layout related stuff is minimum
-
-              // by default there but you can modify it => it is must to modify
-              // layoutBuilder: (currentChild, previousChildren) {
-              //   return Stack(
-              //     alignment: Alignment.center,
-              //     children: <Widget>[
-              //       ...previousChildren,
-              //       if (currentChild != null) currentChild,
-              //     ],
-              //   );
-              // },
-               layoutBuilder: (currentChild, previousChildren) {
-                return Stack(
-                  children: [
-                    ...previousChildren,
-                    if (currentChild != null)
-                      AnimatedOpacity(
-                        opacity: 1.0,
-                        duration: const Duration(milliseconds: 800),
-                        child: currentChild,
-                      ),
-                  ],
-                );
-              },
-
-              /// By default there but you can modify it
-              // transitionBuilder: (Widget child, Animation<double> animation) {
-              //   return FadeTransition(
-              //     opacity: animation,
-              //     child: child,
-              //   );
-              // },
-              child: (_currentText == "")
-                  ? Text(_defaultMessage)
-                  : MarkdownBody(
-                      data: _currentText, // The text we are animating
-                      key: ValueKey<String>(
-                          // Main thing is that No one is using Keys , and these Keys makes animation Smoother
-                          _currentText), // Assign unique key for animation
-                    ),
-            ),
+      body: SingleChildScrollView(
+        controller: _scrollController, // Attach scroll controller
+        child: AnimatedSwitcher(
+          duration: const Duration(seconds: 1),
+          // Modify layout builder to handle transitions
+          layoutBuilder: (currentChild, previousChildren) {
+            return Stack(
+              children: <Widget>[
+                ...previousChildren,
+                if (currentChild != null) currentChild,
+              ],
+            );
+          },
+          // Smooth transition for the Markdown
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          // Display current Markdown text with a unique key
+          child: MarkdownBody(
+            data: _currentText,
+            key: ValueKey<String>(
+                _currentText), // Use ValueKey to trigger animation
           ),
         ),
       ),
@@ -184,5 +107,11 @@ added to the text”
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 }
