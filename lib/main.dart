@@ -1,117 +1,158 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_selectionarea/flutter_markdown_selectionarea.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FadeRevealMarkdownDifference extends StatefulWidget {
+  const FadeRevealMarkdownDifference({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Animated Text Display',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const AnimatedTextScreen(),
-    );
-  }
+  State<FadeRevealMarkdownDifference> createState() =>
+      _FadeRevealMarkdownDifferenceState();
 }
 
-class AnimatedTextScreen extends StatefulWidget {
-  const AnimatedTextScreen({super.key});
-
-  @override
-  State createState() => _AnimatedTextScreenState();
-}
-
-class _AnimatedTextScreenState extends State<AnimatedTextScreen> {
-  String _currentText = "## Problem\nThis is"; // Initial text
-  final ScrollController _scrollController = ScrollController();
-  final List<String> _incomingTexts = [
+class _FadeRevealMarkdownDifferenceState
+    extends State<FadeRevealMarkdownDifference>
+    with SingleTickerProviderStateMixin {
+  final List<String> markdownVersions = [
     "## Problem\nThis is the main issue with what",
     "## Problem\nThis is the main issue with what we're trying to solve.",
     "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases.",
     "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production.",
     "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly.",
-    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase.",
-    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required.",
-    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required. The development cycle has slowed down due to these issues.",
-    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required. The development cycle has slowed down due to these issues, resulting in missed deadlines.",
-    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. Several team members have reported difficulties in maintaining the current codebase, and urgent hotfixes are often required. The development cycle has slowed down due to these issues, resulting in missed deadlines and higher costs."
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability. Regular user feedback should be collected to continuously improve the system.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability. Regular user feedback should be collected to continuously improve the system. The project should be managed using agile methodologies to ensure flexibility and adaptability.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability. Regular user feedback should be collected to continuously improve the system. The project should be managed using agile methodologies to ensure flexibility and adaptability. The team should also focus on documentation and knowledge sharing to ensure smooth onboarding of new team members.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability. Regular user feedback should be collected to continuously improve the system. The project should be managed using agile methodologies to ensure flexibility and adaptability. The team should also focus on documentation and knowledge sharing to ensure smooth onboarding of new team members. The system should be regularly audited for security vulnerabilities to ensure data protection.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability. Regular user feedback should be collected to continuously improve the system. The project should be managed using agile methodologies to ensure flexibility and adaptability. The team should also focus on documentation and knowledge sharing to ensure smooth onboarding of new team members. The system should be regularly audited for security vulnerabilities to ensure data protection. The system should also be designed to comply with relevant regulations and standards.",
+    "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability. Regular user feedback should be collected to continuously improve the system. The project should be managed using agile methodologies to ensure flexibility and adaptability. The team should also focus on documentation and knowledge sharing to ensure smooth onboarding of new team members. The system should be regularly audited for security vulnerabilities to ensure data protection. The system should also be designed to comply with relevant regulations and standards. The system should be regularly updated to incorporate the latest technologies and best practices.",
   ];
 
-  int _textIndex = 0;
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
 
-  // Function to append new text
-  void _addText() {
-    if (_textIndex < _incomingTexts.length) {
-      setState(() {
-        _currentText = _incomingTexts[_textIndex]; // Simulate backend response
-        _textIndex++;
-      });
-      _scrollToBottom();
-    }
+  String previousText = "";
+  String currentText = "";
+  String newText = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1), // Duration of the fade effect
+      vsync: this,
+    );
+
+    // Initialize text and animation for the first version
+    _updateText(0);
   }
 
-  // Function to scroll to the bottom
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOut,
+  void _updateText(int versionIndex) {
+    if (versionIndex < 0 || versionIndex >= markdownVersions.length) return;
+
+    setState(() {
+      previousText = versionIndex > 0 ? markdownVersions[versionIndex - 1] : "";
+      currentText = markdownVersions[versionIndex];
+      newText = _findNewText(previousText, currentText);
+
+      // Reinitialize animation for the fade effect
+      _fadeAnimation = Tween<double>(
+        begin: 0.0,
+        end: 1.0,
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Curves.easeInOut,
+        ),
       );
+
+      // Reset and start the animation
+      _controller.reset();
+      _controller.forward();
     });
+  }
+
+  // Compare previous and current text to return the newly added portion
+  String _findNewText(String oldText, String newText) {
+    if (oldText == newText) return "";
+    return newText.substring(oldText.length); // Get new text after old text
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose of the controller to free resources
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Animated Markdown  Display'),
+        title: const Text("Fade Reveal Markdown Difference Effect"),
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController, // Attach scroll controller
-        child: AnimatedSwitcher(
-          duration: const Duration(seconds: 1),
-          // Modify layout builder to handle transitions
-          layoutBuilder: (currentChild, previousChildren) {
-            return Stack(
-              children: <Widget>[
-                ...previousChildren,
-                if (currentChild != null) currentChild,
-              ],
-            );
-          },
-          // Smooth transition for the Markdown
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-          // Display current Markdown text with a unique key
-          child: MarkdownBody(
-            data: _currentText,
-            key: ValueKey<String>(
-                _currentText), // Use ValueKey to trigger animation
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: AnimatedBuilder(
+                animation: _fadeAnimation,
+                builder: (context, child) {
+                  // Combine the old static markdown and the animated new markdown
+                  String fullMarkdown = previousText + newText;
+
+                  return Stack(
+                    children: [
+                      Opacity(
+                        opacity: 1 - _fadeAnimation.value,
+                        child: MarkdownBody(
+                          data: previousText,
+                          styleSheet: MarkdownStyleSheet(
+                            h2: const TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                            p: const TextStyle(
+                                fontSize: 18, color: Colors.black87),
+                          ),
+                        ),
+                      ),
+                      Opacity(
+                        opacity: _fadeAnimation.value,
+                        child: MarkdownBody(
+                          data: fullMarkdown,
+                          styleSheet: MarkdownStyleSheet(
+                            h2: const TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                            p: const TextStyle(
+                                fontSize: 18, color: Colors.black87),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addText,
-        tooltip: 'Add Text',
         child: const Icon(Icons.add),
+        onPressed: () {
+          // Move to the next version and restart the animation
+          int nextIndex = (markdownVersions.indexOf(currentText) + 1) %
+              markdownVersions.length;
+          _updateText(nextIndex);
+        },
       ),
     );
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _scrollController.dispose();
-  }
 }
+
+void main() => runApp(const MaterialApp(
+      home: FadeRevealMarkdownDifference(),
+    ));
