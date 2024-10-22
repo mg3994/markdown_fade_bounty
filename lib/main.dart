@@ -32,60 +32,26 @@ class _FadeRevealMarkdownDifferenceState
     "## Problem\nThis is the main issue with what we're trying to solve. The current solution is insufficient for handling edge cases, and it leads to frequent breakdowns in production. As a result, customer satisfaction has dropped significantly. We need a more robust solution that can handle these edge cases effectively. This will require a complete overhaul of the system. The new system should be designed with scalability and reliability in mind. Additionally, it should be user-friendly and easy to maintain. The development team should also consider implementing automated testing to ensure the system's stability. Regular user feedback should be collected to continuously improve the system. The project should be managed using agile methodologies to ensure flexibility and adaptability. The team should also focus on documentation and knowledge sharing to ensure smooth onboarding of new team members. The system should be regularly audited for security vulnerabilities to ensure data protection. The system should also be designed to comply with relevant regulations and standards. The system should be regularly updated to incorporate the latest technologies and best practices.",
   ];
 
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-
   String previousText = "";
   String currentText = "";
-  String newText = "";
+  late ValueKey key;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1), // Duration of the fade effect
-      vsync: this,
-    );
 
-    // Initialize text and animation for the first version
     _updateText(0);
   }
 
   void _updateText(int versionIndex) {
     if (versionIndex < 0 || versionIndex >= markdownVersions.length) return;
+    // Reset and start the animation
 
     setState(() {
       previousText = versionIndex > 0 ? markdownVersions[versionIndex - 1] : "";
       currentText = markdownVersions[versionIndex];
-      newText = _findNewText(previousText, currentText);
-
-      // Reinitialize animation for the fade effect
-      _fadeAnimation = Tween<double>(
-        begin: 0.0,
-        end: 1.0,
-      ).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Curves.easeInOut,
-        ),
-      );
-
-      // Reset and start the animation
-      _controller.reset();
-      _controller.forward();
+      key = ValueKey(currentText);
     });
-  }
-
-  // Compare previous and current text to return the newly added portion
-  String _findNewText(String oldText, String newText) {
-    if (oldText == newText) return "";
-    return newText.substring(oldText.length); // Get new text after old text
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose(); // Dispose of the controller to free resources
-    super.dispose();
   }
 
   @override
@@ -100,43 +66,10 @@ class _FadeRevealMarkdownDifferenceState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: AnimatedBuilder(
-                animation: _fadeAnimation,
-                builder: (context, child) {
-                  // Combine the old static markdown and the animated new markdown
-                  String fullMarkdown = previousText + newText;
-
-                  return Stack(
-                    children: [
-                      Opacity(
-                        opacity: 1 - _fadeAnimation.value,
-                        child: MarkdownBody(
-                          data: previousText,
-                          styleSheet: MarkdownStyleSheet(
-                            h2: const TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                            p: const TextStyle(
-                                fontSize: 18, color: Colors.black87),
-                          ),
-                        ),
-                      ),
-                      Opacity(
-                        opacity: _fadeAnimation.value,
-                        child: MarkdownBody(
-                          data: fullMarkdown,
-                          styleSheet: MarkdownStyleSheet(
-                            h2: const TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                            p: const TextStyle(
-                                fontSize: 18, color: Colors.black87),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
+                child: FadingMarkdownBody(
+                    key: key,
+                    previousText: previousText,
+                    fullMarkdown: currentText)),
           ],
         ),
       ),
@@ -149,6 +82,62 @@ class _FadeRevealMarkdownDifferenceState
           _updateText(nextIndex);
         },
       ),
+    );
+  }
+}
+
+class FadingMarkdownBody extends StatelessWidget {
+  final String previousText;
+  final String fullMarkdown;
+  final Duration duration; // Duration for the fade animation
+
+  const FadingMarkdownBody({
+    super.key,
+    required this.previousText,
+    required this.fullMarkdown,
+    this.duration = const Duration(seconds: 3), // Default duration
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      key: key,
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: duration,
+      builder: (context, opacity, child) {
+        return Stack(
+          children: [
+            // Previous text fading out
+            AnimatedOpacity(
+              duration: duration,
+              // duration: const Duration(seconds: 4),
+              opacity: 1.0 - opacity, // Fades out
+              child: MarkdownBody(
+                data: previousText,
+                styleSheet: MarkdownStyleSheet(
+                  h2: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                  p: const TextStyle(fontSize: 18, color: Colors.black87),
+                ),
+              ),
+            ),
+            // Full text fading in
+            AnimatedOpacity(
+              duration: Duration.zero,
+              opacity: opacity, // Fades in
+              child: MarkdownBody(
+                data: fullMarkdown,
+                styleSheet: MarkdownStyleSheet(
+                  h2: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                  p: const TextStyle(fontSize: 18, color: Colors.black87),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+      onEnd: () {},
     );
   }
 }
